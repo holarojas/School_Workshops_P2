@@ -1,0 +1,75 @@
+/*----------------------------------------------
+// Workshop 7
+// Reflection
+------------------------------------------------
+Name:	Martha Rocio Rojas Martinez
+Mail:	mrrojas-martinez@myseneca.ca
+ID:	112073218
+Date:	Nov 13th, 2022
+----------------------------------------------*/
+
+This has been one of the most straightforward Workshops I've done during the semester. It is nice to know we have all these algorithms available because it makes the work much more manageable. Although, one part of it that was a bit complicated was getting to know how to properly read the documentation to write the appropriate arguments for each function. 
+
+
+----  Q1.  ------------------------------------
+List all the STL functions that you have used in this workshop; explain your reasoning for choosing each one, and not another.
+
+
+1. SORT
+std::sort(m_crimes.begin(), m_crimes.end(), [](const Crime& lhs, const Crime& rhs) {
+	return lhs.m_province < rhs.m_province;
+	});
+
+
+2. REPLACE IF
+std::replace_if(m_crimes.begin(), m_crimes.end(), [&replacement](const Crime& elem) -> bool {
+	Bool result = false;
+	if (elem.m_crime == "[None]") {
+		//Copy the original object's value to the temporary object
+		replacement = elem;
+		//Modify the string for the attribute m_crime
+		replacement.m_crime = "";
+		result = true;
+	}
+	return result;				 
+	},  replacement);
+
+
+
+3.ANY OF
+std::any_of(m_crimes.begin(), m_crimes.end(), [&crimeName](const Crime& elem) {
+	return crimeName == elem.m_crime;
+});
+
+
+4. COUNT IF
+auto cnt = std::count_if(m_crimes.begin(), m_crimes.end(), isProvinceMatch);
+
+
+5. COPY IF
+std::copy_if(m_crimes.begin(), m_crimes.end(), newContainer.begin(), isProvinceMatch);
+
+
+6. FOR EACH
+std::for_each(m_crimes.begin(), m_crimes.end(), [&](const Crime& elem) {
+	std::cout << elem << std::endl;
+	totCrimes += elem.m_noOfCases;
+	totResolved += elem.m_resolved;
+	}
+);
+
+
+----  Q2.  ------------------------------------
+Present the advantages of using STL algorithms vs. implementing the functionality by yourself using loops.
+
+
+We can significantly reduce the amount of code we write if we simply use the already-defined algorithms.
+It is also time-saving because we don't need to think thoroughly about the logic we need to accomplish the tasks required by the algorithms.
+
+
+
+----  Q3.  ------------------------------------
+The function that sorts the collection of crimes receives as a parameter the field name to use; this can create errors if the client specifies an invalid field (or misspells it). How would you redesign that function to prevent the client to specify an invalid string, allowing any error to be detected by the compiler?
+
+We could throw an error for the compiler to detect that there has been an exception.
+Another approach could be to modify the client code and show them a menu of acceptable options, so they won't be able to choose incompatible options.
