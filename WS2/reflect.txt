@@ -1,0 +1,28 @@
+/*----------------------------------------------
+// Workshop 2
+// Reflection
+------------------------------------------------
+Name:	Martha Rocio Rojas Martinez
+Mail:	mrrojas-martinez@myseneca.ca
+ID:	112073218
+Date:	Sept. 25th, 2022
+----------------------------------------------*/
+
+The reason for the significant time difference between the copy and move operations relies on the fact that when we use the Copy Assignment Operation we take more time while doing the process of allocating new memory to the resource with the command:
+	m_tennisMatch = new TennisMatch[tMatchCount];
+I believe this process can take additional time as the program needs to assign new regions of memory.
+
+On the other hand, when we use the Move Assignment Operation, we omit that process. The program does not waste time on allocating memory but only copies the pointer where the resource is allocated, so now the new object knows the position where the memory of that resource is.
+
+
+I used two functions to read the input file and populate the dynamic array. The first one: void TennisLog::readToCount(std::istream& is) was used to read the file and count the number of records in it. This way I could know the correct size for the dynamic array.
+The second one: void TennisMatch::read(std::istream& is) was used to reread the file from the beginning and populate the attributes for each record.
+I did a quick search online, and it seems like working with vectors could help by populating the attributes while reading the file simultaneously. However, I would not know how to do it.
+
+
+The difference between the two types of clocks is that both have different starting points.
+For system_clock the starting point is the date 01-01-1970, and for steady_clock the start date typically is the boot time of the PC the program is running.
+
+steady_clock is the preferred to wait for a time duration or until a time point.
+
+
