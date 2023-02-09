@@ -1,0 +1,38 @@
+/*----------------------------------------------
+// Workshop 3
+// Reflection
+------------------------------------------------
+Name:	Martha Rocio Rojas Martinez
+Mail:	mrrojas-martinez@myseneca.ca
+ID:	112073218
+Date:	Oct. 2nd, 2022
+----------------------------------------------*/
+
+The topics that I practiced while working on this workshop were: function templates, class templates, specialization templates, inheritance and virtual functions.
+
+The issue I faced was specific in part 2 when I created the push override function in the UniqueQueue class. I wrote this function definition in a UniqueQueue.cpp file, so when trying to compile, I was getting Linking errors saying that the compiler could not find the functions necessary for push() when working with Long, Double and Dictionary types which I found odd since that was the whole point on writing the push() function as a template. Some hours later, I remembered I should have added the definition in the Header file, so I did that, and now the template function was working as expected. Finally, I was able to compile my program.
+
+So, this problem I presented answers the question of why we should not split Queue and UniqueQueue modules into .h and .cpp as we have done in previous workshops. The exact reason is that if we write a template function in a cpp file, we could only use that template in that cpp.
+
+For the Dictionary Module, I added two special functions:
+	Dictionary(const Dictionary& other);
+	Dictionary& operator=(const Dictionary& other);
+I included them to follow the Rule of 3 and also because some of my templates had the assumption that the template parameter (in this case Dictionary) must have had a copy assignment operator and/or a copy constructor in order to work
+
+
+The purpose of specializing the push() member function was to specify an acceptable range to consider a double number as a duplicate. We only needed to make this distinction while working with doubles, that's why we specialized the push() function.
+
+for (unsigned int i = 0; i < objCount; ++i) {
+	if (fabs(getObjInQueue(i)) < (fabs(item) - 0.005) || fabs(getObjInQueue(i)) > (fabs(item) + 0.005)) {
+	//Both items are considered different
+	}
+	else {
+		duplicate = true;
+	}
+}
+
+
+The reason for defining the class variable outside the class definition was that we set it as static. The constructor won't initialize static members, so we needed to do that step ourselves.
+
+template<typename T, unsigned int CAPACITY>
+T Queue<T, CAPACITY>::m_dummy{ };
