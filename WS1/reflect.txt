@@ -1,0 +1,18 @@
+/*----------------------------------------------
+// Workshop 1
+// Reflection
+------------------------------------------------
+Name:	Martha Rocio Rojas Martinez
+Mail:	mrrojas-martinez@myseneca.ca
+ID:	112073218
+Date:	Sept. 17th, 2022
+----------------------------------------------*/
+
+During this workshop, I practiced writing code correctly so the compiler would not find errors during any of the 3 stages of the compilation process.
+I also use External Linkage with the variables g_taxrate and g_discount; those variables are defined in module w1_p2.cpp, but I declared them as external in the module carads, which was why I could use them between translation units. Suppose I had set those variables as Internal Linkage in carads module. In that case, I could not have been able to use them in a different module.
+
+The effect of the keyword "constexpr" is that the value cannot be changed after the creation of the variable and the value must be known at compile time. I am complying with both conditions, the value at creation is known, which is 100, and I am not modifying the value during the program's lifetime.
+
+The main thing I changed from part 1 was the allocation of memory for the array of char resources of the Cars class. In part 1, I used static memory, but for part 2, I changed them to be dynamically allocated. Because of this change, I needed to take care of the Rule of 3 for best practices regarding memory allocation and deallocation.
+
+I struggled a bit because I forgot to add + 1 when allocating the memory with the new command. When trying to destroy the resource, I got an error that I wrote past the assigned memory. I fix it by adding the +1 when allocating the resource memory.
