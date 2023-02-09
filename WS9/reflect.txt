@@ -1,0 +1,145 @@
+/*----------------------------------------------
+// Workshop 9
+// Reflection
+------------------------------------------------
+Name:	Martha Rocio Rojas Martinez
+Mail:	mrrojas-martinez@myseneca.ca
+ID:	112073218
+Date:	Nov 27th, 2022
+----------------------------------------------*/
+
+During this workshop I got to practice how to read and write to and from binary files. And how to upgrade our program by using threads.
+
+
+----  Q1.  ------------------------------------
+- How were binary files used in this workshop, describe the process of using them compared to non binary files.
+-----------------------------------------------
+We needed to write the contents of the original text file to a binary file, and then read the binary file's content and interpret it to display it.
+
+The process to use them is similar to regular text files. We need to create an fstream object, only in this case we need to specify that is a binary file.
+We must open the file and then use it.
+The difference between binary files and text files is that we need to consider the size of the variable we are using.
+
+BINARY WRITING:
+ std::fstream out(filename, std::ios::out | std::ios::binary);
+ if (out.is_open()) {
+ 	out.write(reinterpret_cast<char*>(&rows), sizeof(rows)); //Number of rows
+ 	out.write(reinterpret_cast<char*>(&colSize), sizeof(colSize)); //Size of every row
+ 	for (auto i = 0u; i < rows; ++i) {
+ 		out.write(reinterpret_cast<char*>(&map[i][0]), colSize); //Write the row themselves
+ 	}
+	out.close();
+}
+
+BINARY READING:
+std::fstream in(filename, std::ios::in | std::ios::binary);
+if (in.is_open()) {
+	in.read(reinterpret_cast<char*>(&rows), sizeof(rows)); //Read 4 bytes
+	in.read(reinterpret_cast<char*>(&colSize), sizeof(colSize)); //Read 4 bytes
+	if (map == nullptr) {
+		map = new std::string[rows];
+	}
+	for (auto i = 0u; i < rows; ++i) {      
+		map[i].resize(colSize);
+		in.read(reinterpret_cast<char*>(&map[i][0]), colSize); 
+	}
+}
+
+
+
+
+----  Q2.  ------------------------------------
+- Why would be important to bind a function to its arguments, and how was it useful in this workshop
+-----------------------------------------------
+When having a function we could have arguments that can be constants and other arguments that need to change every time we call the function. So we can bind the function to arguments and use placeholders to only change that argument when calling the function.
+
+In this workshop it could be useful to have the same function but with different arguments (in our case the partitioned data which is an std::string) and call the same function in the 4 different packaged_task objects:
+
+
+//Binding function digForTreasure to arguments
+	auto funcA = std::bind(digForTreasure, mapPartA, mark);
+	auto funcB = std::bind(digForTreasure, mapPartB, mark);
+	auto funcC = std::bind(digForTreasure, mapPartC, mark);
+	auto funcD = std::bind(digForTreasure, mapPartD, mark);
+
+//auto func = std::bind(digForTreasure, std::placeholders::_1, mark); //I could not make placeholders to work as arguments to the packaged_task
+
+//Create some packaged_tasks with the bound version of digForTreasure()
+      std::packaged_task<size_t()> ptA(funcA);
+      std::packaged_task<size_t()> ptB(funcB);
+      std::packaged_task<size_t()> ptC(funcC);
+      std::packaged_task<size_t()> ptD(funcD);
+     
+
+In my case I could not figure out how to call a function with arguments in the packaged_task constructor. I wanted to have something like this:
+
+auto func = std::bind(digForTreasure, std::placeholders::_1, mark); 
+
+std::packaged_task<size_t()> ptA(func(mapPartA));
+std::packaged_task<size_t()> ptB(func(mapPartB));
+std::packaged_task<size_t()> ptC(func(mapPartC));
+std::packaged_task<size_t()> ptD(func(mapPartD));
+
+But the compiler gave me an error. So I ended up using 4 different bind version of the same functions.
+
+
+
+
+----  Q3.  ------------------------------------
+- The advantages of using multiple threads, and how did you accomplished multi-threading in this workshop
+-----------------------------------------------
+
+The advantage of using multiple threads is that we could do multiple sessions of a certain activity or instructions in parallel.
+
+I accomplished multi-threading by using Packaged Tasks where the promise object is handled by the package task itself, and we take car of the future object.
+
+
+
+
+//Create some packaged_tasks with the bound version of digForTreasure()
+        std::packaged_task<size_t()> ptA(funcA);
+        std::packaged_task<size_t()> ptB(funcB);
+        std::packaged_task<size_t()> ptC(funcC);
+        std::packaged_task<size_t()> ptD(funcD);
+     
+
+//Associate packaged_tasks with future objects to eventually retrieve the result of those tasks
+        std::future<size_t> fA = ptA.get_future();
+        std::future<size_t> fB = ptB.get_future();
+        std::future<size_t> fC = ptC.get_future();
+        std::future<size_t> fD = ptD.get_future();
+
+//Create some threads and provide them the packaged_tasks and the partitioned data to be processed
+        std::thread thread_A(std::move(ptA));
+        std::thread thread_B(std::move(ptB));
+        std::thread thread_C(std::move(ptC));
+        std::thread thread_D(std::move(ptD));
+
+//Wait for the child threads to finish
+        thread_A.join();
+        thread_B.join();
+        thread_C.join();
+        thread_D.join();
+
+//Retrieve the data from the futures once the threads have completed their tasks
+        count = fA.get() + fB.get() + fC.get() + fD.get();
+
+
+
+
+
+----  Q4.  ------------------------------------
+- Futures and packaged_tasks were used in the workshop, describe their relationship to one another and how they were used with the threads
+-----------------------------------------------
+
+The future object makes easier the transfer of values between threads by using a shared state.
+The future object can retrieve the value that a packaged task has stored in a shared state.
+
+Each package task and future object maintains a synchronization point for two threads that are being executed at the same time.
+
+The package task object launches a thread and capture the return value which the future object can then retrieve.
+
+
+We used them to retrieve the return values of each thread and add them up to the count variable.
+
+count = fA.get() + fB.get() + fC.get() + fD.get();
