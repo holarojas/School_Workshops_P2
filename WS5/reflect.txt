@@ -1,0 +1,75 @@
+/*----------------------------------------------
+// Workshop 5
+// Reflection
+------------------------------------------------
+Name:	Martha Rocio Rojas Martinez
+Mail:	mrrojas-martinez@myseneca.ca
+ID:	112073218
+Date:	Oct. 18th, 2022
+----------------------------------------------*/
+
+During this workshop, I got to practice implementing templated classes (Collection), templated functions, pointer to functions, Functor classes, lambda expressions and error handling.
+
+
+Functor or Function Objects are the type of classes with instances that can be used in functions. We can identify them because the () operator is overloaded.
+Lambda expression is the mechanism to implement an anonymous function.
+The difference between them is that Lambda expressions are helpful when we want to implement a simple throw-away function and when it is only needed in a small region of the program, hence we are not constantly reusing it.
+
+Example of a lambda expression in our code:
+auto updatePrice = [usdToCadRate, gbpToCadRate](Book& book)
+	{
+		if (book.country() == "US") {
+			book.price() *= usdToCadRate;
+		}
+		else if (book.country() == "UK" && (book.year() >= 1990 && book.year() <= 1999)) {
+			book.price() *= gbpToCadRate;
+		}
+	};
+
+Example of a Functor:
+SpellChecker is a functor class because it overloads the () operator:
+void SpellChecker::operator()(std::string& text)
+	{
+		//It should count how many times each misspelled word has been replaced
+		size_t pos{};
+		size_t posFound{};
+
+		//Search the whole text for each mispelled word [i]   at a time
+		for (auto i = 0u; i < m_bwCount; ++i) {
+			//Using iterators to keep reading after I find the [i] mispelled word
+			for (auto it = text.begin(); it != text.end(); ++it) { 
+				posFound = text.find(m_badWords[i], pos);
+				//If mispelled word is found
+				if (posFound != std::string::npos) {
+					++m_mispWordsCtr[i];
+					text.replace(posFound, m_badWords[i].length(), m_goodWords[i]);
+					posFound = std::string::npos;
+				}
+				
+			}
+		}
+		
+	}
+
+
+We could change the code to use other methods for handling errors. For instance, we could have used the return keyword instead of throwing an exception, but then the user would not have much information on the problem and how they could prevent it from happening again. In the client code, we could have used an exit() to terminate the program if an undesired situation occurred during runtime.
+
+ 
+To prevent the duplication of code when loading data into both classes (Movie and Book), we could have created a parent class called Media and assign to it the attributes and the constructor that are duplicated for both classes, something like:
+class Media {
+	std::string m_title{};
+	size_t m_year{};
+	std::string m_descr{};
+};
+
+
+and then inherit those attributes to both Book and Movie classes and add the rest of the attributes for the Book class.
+
+
+If we have a Custom Constructor, we must code the Default Constructor explicitly. Otherwise, the program won't compile. We should not remove it.
+
+Book()	{ }; //Default Cnstructor
+Book(const std::string& strBook);
+
+Movie()	{ }; //Default Constructor
+Movie(const std::string& strMovie);
