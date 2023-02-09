@@ -1,0 +1,79 @@
+/*----------------------------------------------
+// Workshop 6
+// Reflection
+------------------------------------------------
+Name:	Martha Rocio Rojas Martinez
+Mail:	mrrojas-martinez@myseneca.ca
+ID:	112073218
+Date:	Nov 06th, 2022
+----------------------------------------------*/
+
+During this workshop, I got to practice the Inheritance of classes, specially Polymorphism using Interfaces.
+Also, I created and managed some types of STL containers, like vectors and lists.
+Finally, another topic that I could practice was Exception Handling.
+
+The most challenging part for me was trying to get the logic right for extracting the correct data for each token every time and how to handle the data correctly for the "messy" files. I needed to read about the sstream library, and I may not have used the most efficient way to read from the input stream because, for me, the fact that we were using a reference made it more complicated. After reading the data for each token, we needed to be very careful about keeping track of the position we were in the stream. 
+
+----  Q1.  ------------------------------------
+Why do you need to deallocate the dynamically allocated memory in your vector?
+
+
+The vector was storing pointers to Vehicles:
+std::vector<Vehicle*> m_vehicles;
+
+And when we were creating each type of vehicle, we were doing it dynamically:
+if (firstChar == "c" || firstChar == "C") {
+	pObj = new Car(in);
+}
+else if (firstChar == "v" || firstChar == "V") {
+	pObj = new Van(in);
+}
+else if (firstChar == "r" || firstChar == "R") {
+	pObj = new Racecar(in);
+}
+else if (firstChar == "l" || firstChar == "L") {
+	pObj = new Luxuryvan(in);
+}
+
+So, like we are allocating the memory at runtime, we need to make sure to deallocate it in the Autoshop destructor:
+for (auto it = m_vehicles.begin(); it != m_vehicles.end(); ++it) {
+	delete* it;
+}
+
+
+----  Q2.  ------------------------------------
+When building an object from the input file, different things can go wrong: the record represents an unknown type of vehicle, or record contains invalid data. 
+ How can the function loadData() detect what went wrong? 
+ Can you think at another solution than the one you have implemented?
+
+
+
+To detect if something went wrong, we first need to manage exception logic in the constructors and throw errors from there for any possible error scenarios.
+We needed to add the try ... catch code in the client code to catch those errors.
+
+try {
+	sdds::Vehicle* aVehicle = sdds::createInstance(file);
+	if (aVehicle)
+		as += aVehicle;
+}
+catch (const char* err) {
+	std::cerr << err << std::endl;
+}
+catch (const std::out_of_range& err) {
+	std::cerr << err.what() << std::endl;
+}
+
+
+
+----  Q3.  ------------------------------------
+In this workshop you had to use std::list<sdds::Vehicle*> and std::vector<sdds::Vehicle*> to store a collection of vehicles as pointers. 
+Could you have used std::list<sdds::Vehicle> and std::vector<sdds::Vehicle> instead? Justify your answer!
+
+
+It is possible to create a vector or list of type Vehicle, but in this workshop, we used pointers because that's the way it was defined in the client code.
+
+sdds::Vehicle* aVehicle = sdds::createInstance(file);
+if (aVehicle)
+	as += aVehicle;
+
+So every Vehicle derived object was created, and its pointer was added to the container.
